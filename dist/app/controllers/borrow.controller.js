@@ -15,22 +15,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBorrowedSummary = exports.borrowBook = void 0;
 const book_model_1 = __importDefault(require("../models/book.model"));
 const borrow_model_1 = __importDefault(require("../models/borrow.model"));
+// ✅ Controller: Borrow a book
 const borrowBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { book: bookId, quantity, dueDate } = req.body;
+        // Find the book by ID
         const book = yield book_model_1.default.findById(bookId);
         if (!book || book.copies < quantity) {
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: 'Not enough copies available',
                 error: 'Insufficient copies'
             });
+            return;
         }
+        // Update book availability
         book.copies -= quantity;
-        if (book.copies === 0)
+        if (book.copies === 0) {
             book.available = false;
+        }
         yield book.save();
-        const borrow = yield borrow_model_1.default.create({ book: bookId, quantity, dueDate });
+        // Create borrow record
+        const borrow = yield borrow_model_1.default.create({
+            book: bookId,
+            quantity,
+            dueDate
+        });
         res.status(201).json({
             success: true,
             message: 'Book borrowed successfully',
@@ -38,10 +48,15 @@ const borrowBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
     catch (error) {
-        res.status(400).json({ success: false, message: 'Borrow failed', error });
+        res.status(400).json({
+            success: false,
+            message: 'Borrow failed',
+            error: error.message
+        });
     }
 });
 exports.borrowBook = borrowBook;
+// ✅ Controller: Get borrowed summary
 const getBorrowedSummary = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const summary = yield borrow_model_1.default.aggregate([
@@ -59,9 +74,7 @@ const getBorrowedSummary = (_req, res) => __awaiter(void 0, void 0, void 0, func
                     as: 'bookInfo'
                 }
             },
-            {
-                $unwind: '$bookInfo'
-            },
+            { $unwind: '$bookInfo' },
             {
                 $project: {
                     book: {
@@ -72,14 +85,18 @@ const getBorrowedSummary = (_req, res) => __awaiter(void 0, void 0, void 0, func
                 }
             }
         ]);
-        res.json({
+        res.status(200).json({
             success: true,
             message: 'Borrowed books summary retrieved successfully',
             data: summary
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, message: 'Summary failed', error });
+        res.status(500).json({
+            success: false,
+            message: 'Summary failed',
+            error: error.message
+        });
     }
 });
 exports.getBorrowedSummary = getBorrowedSummary;

@@ -2,25 +2,36 @@ import { Request, Response } from 'express';
 import bookModel from '../models/book.model';
 import borrowModel from '../models/borrow.model';
 
-
-export const borrowBook:any = async (req: Request, res: Response) => {
+// ✅ Controller: Borrow a book
+export const borrowBook = async (req: Request, res: Response): Promise<void> => {
   try {
     const { book: bookId, quantity, dueDate } = req.body;
+
+    // Find the book by ID
     const book = await bookModel.findById(bookId);
 
     if (!book || book.copies < quantity) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: 'Not enough copies available',
         error: 'Insufficient copies'
       });
+      return;
     }
 
+    // Update book availability
     book.copies -= quantity;
-    if (book.copies === 0) book.available = false;
+    if (book.copies === 0) {
+      book.available = false;
+    }
     await book.save();
 
-    const borrow = await borrowModel.create({ book: bookId, quantity, dueDate });
+    // Create borrow record
+    const borrow = await borrowModel.create({
+      book: bookId,
+      quantity,
+      dueDate
+    });
 
     res.status(201).json({
       success: true,
@@ -28,11 +39,16 @@ export const borrowBook:any = async (req: Request, res: Response) => {
       data: borrow
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: 'Borrow failed', error });
+    res.status(400).json({
+      success: false,
+      message: 'Borrow failed',
+      error: (error as Error).message
+    });
   }
 };
 
-export const getBorrowedSummary = async (_req: Request, res: Response) => {
+// ✅ Controller: Get borrowed summary
+export const getBorrowedSummary = async (_req: Request, res: Response): Promise<void> => {
   try {
     const summary = await borrowModel.aggregate([
       {
@@ -49,9 +65,7 @@ export const getBorrowedSummary = async (_req: Request, res: Response) => {
           as: 'bookInfo'
         }
       },
-      {
-        $unwind: '$bookInfo'
-      },
+      { $unwind: '$bookInfo' },
       {
         $project: {
           book: {
@@ -63,12 +77,16 @@ export const getBorrowedSummary = async (_req: Request, res: Response) => {
       }
     ]);
 
-    res.json({
+    res.status(200).json({
       success: true,
       message: 'Borrowed books summary retrieved successfully',
       data: summary
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Summary failed', error });
+    res.status(500).json({
+      success: false,
+      message: 'Summary failed',
+      error: (error as Error).message
+    });
   }
 };

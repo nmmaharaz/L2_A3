@@ -44,7 +44,7 @@ const borrowBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 exports.borrowBook = borrowBook;
 const getBorrowedSummary = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const summary = yield Borrow.aggregate([
+        const summary = yield borrow_model_1.default.aggregate([
             {
                 $group: {
                     _id: '$book',

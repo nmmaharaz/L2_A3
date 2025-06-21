@@ -3,7 +3,7 @@ import bookModel from '../models/book.model';
 import borrowModel from '../models/borrow.model';
 
 
-export const borrowBook = async (req: Request, res: Response) => {
+export const borrowBook:any = async (req: Request, res: Response) => {
   try {
     const { book: bookId, quantity, dueDate } = req.body;
     const book = await bookModel.findById(bookId);

@@ -46,5 +46,5 @@ const bookSchema = new mongoose_1.Schema({
     description: { type: String },
     copies: { type: Number, required: true, min: 0 },
     available: { type: Boolean, default: true }
-}, { timestamps: true });
+}, { timestamps: true, versionKey: false });
 exports.default = mongoose_1.default.model('Book', bookSchema);

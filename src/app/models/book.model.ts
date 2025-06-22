@@ -22,6 +22,6 @@ const bookSchema = new Schema<IBook>({
   description: { type: String },
   copies: { type: Number, required: true, min: 0 },
   available: { type: Boolean, default: true }
-}, { timestamps: true, versionKey: false });
+}, { timestamps: true });
 
 export default mongoose.model<IBook>('Book', bookSchema);

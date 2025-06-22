@@ -34,6 +34,7 @@ export const getAllBooks = async (req: Request, res: Response) => {
       data: books
     });
   } catch (error) {
+    console.log("error showing", error)
     res.status(500).json({ success: false, message: 'Error retrieving books', error });
   }
 };

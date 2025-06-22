@@ -41,7 +41,6 @@ const getAllBooks = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const books = yield book_model_1.default.find(query)
             .sort({ [sortBy]: sort === 'asc' ? 1 : -1 })
             .limit(parseInt(limit));
-        console.log(books);
         res.json({
             success: true,
             message: 'Books retrieved successfully',

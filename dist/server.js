@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = __importDefault(require("./index"));
 const port = process.env.PORT || 5000;
 index_1.default.get("/", (req, res) => {
-    res.send("Server is running");
+    res.send("Welcome to the Library Management API");
 });
 index_1.default.listen(port, () => {
     console.log(`Server running on port ${port}`);

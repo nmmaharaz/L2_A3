@@ -1,145 +1,142 @@
 # 📚 Library Management API
 
-A RESTful API built with **Express.js**, **TypeScript**, and **MongoDB** to manage books and borrow records efficiently.
+A powerful RESTful API built with Express.js, TypeScript, and MongoDB for managing library books and borrow operations.
+
+> Developed as Assignment 3 for the Level 2 Web Development Course
 
 ---
 
-## 🚀 Features
+## 🛠️ Tech Stack
 
-- 📖 Create, Read, Update, Delete (CRUD) for books
-- 🔍 Filtering & Sorting (by genre, creation date)
-- 📦 Borrow book with quantity check & update
-- 📊 Borrow summary using MongoDB Aggregation
-- ✅ Validation with Mongoose Schema
-- ⚙️ Static methods & Middleware
-
----
-
-## 📁 Folder Structure
-
-```
-src/
-├── app/
-│   ├── config/
-│   │   └── db.ts
-│   ├── controllers/
-│   │   ├── book.controller.ts
-│   │   └── borrow.controller.ts
-│   ├── models/
-│   │   ├── book.model.ts
-│   │   └── borrow.model.ts
-│   └── route/
-│       ├── book.route.ts
-│       └── borrow.route.ts
-├── index.ts
-├── server.ts
-.env
-.gitignore
-package.json
-tsconfig.json
-README.md
-```
+- ⚙️ Node.js + Express.js
+- 🟦 TypeScript
+- 🍃 MongoDB + Mongoose
+- 🌐 dotenv (for environment variables)
+- 🔁 cors (cross-origin resource sharing)
+- 🔥 ts-node-dev (development server)
 
 ---
 
-## 📦 Tech Stack
+## ✨ Key Features
 
-- **Framework:** Express.js  
-- **Language:** TypeScript  
-- **Database:** MongoDB with Mongoose  
-- **Validation:** Mongoose Schema + Custom Middleware  
-- **Tooling:** ts-node-dev, dotenv
+- ✅ Create, read, update, and delete books
+- 🔍 Filter, sort, and paginate book listings
+- 📖 Borrow books with quantity validation
+- 📊 Aggregation pipeline for borrow summary
+- ⚠️ Centralized error handling
+- 🧠 Mongoose validation, middleware, instance methods
 
 ---
 
-## 🔧 Getting Started
-
-### 1️⃣ Clone & Navigate
+## 📁 Project Structure
 
 ```bash
-git clone https://github.com/yourusername/library-api.git
-cd library-api
+src/
+├── app/
+│   ├── controllers/       # Route handlers
+│   ├── models/            # Mongoose schemas
+│   ├── routes/            # API route files
+│   ├── middlewares/       # Error handler and others
+│   └── utils/             # Helper functions
+├── config/                # DB config
+├── index.ts              # App entry point
+└── server.ts             # Starts the server
 ```
 
-### 2️⃣ Install Dependencies
+---
 
+## 🔌 API Endpoints
+
+### 📘 Book Routes
+
+1. ➕ Create a Book
+POST /api/books
+```json
+{
+  "title": "1984",
+  "author": "George Orwell",
+  "genre": "FICTION",
+  "isbn": "9780451524935",
+  "description": "Dystopian novel",
+  "copies": 10
+}
+```
+
+2. 📚 Get All Books
+GET /api/books?filter=FICTION&sortBy=createdAt&sort=desc&limit=5
+
+3. 🔎 Get Book by ID
+GET /api/books/:bookId
+
+4. ✏️ Update Book
+PUT /api/books/:bookId
+```json
+{
+  "copies": 20
+}
+```
+
+5. ❌ Delete Book
+DELETE /api/books/:bookId
+
+---
+
+### 📖 Borrow Routes
+
+6. 📥 Borrow a Book
+POST /api/borrow
+```json
+{
+  "book": "<book_id>",
+  "quantity": 2,
+  "dueDate": "2025-07-18"
+}
+```
+
+7. 📊 Get Borrow Summary
+GET /api/borrow
+- Returns: book title, ISBN, total borrowed quantity (aggregation pipeline)
+
+---
+
+## ⚙️ Setup Instructions
+
+1. ⬇️ Clone the repository
+```bash
+git clone https://github.com/your-username/library-management-api.git
+cd library-management-api
+```
+
+2. 📦 Install dependencies
 ```bash
 npm install
 ```
 
-### 3️⃣ Create `.env` File
-
+3. 🛠️ Create .env file
 ```env
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/assignment3
 PORT=5000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/library
 ```
 
-> ⚠️ `.env` is already listed in `.gitignore`
-
-### 4️⃣ Run Development Server
-
+4. ▶️ Start the development server
 ```bash
 npm run dev
 ```
 
----
-
-## 📮 API Endpoints
-
-### ✅ Books
-
-| Method | Endpoint             | Description                  |
-|--------|----------------------|------------------------------|
-| POST   | `/api/books`         | Create a new book            |
-| GET    | `/api/books`         | Get all books (filterable)   |
-| GET    | `/api/books/:bookId` | Get a single book by ID      |
-| PUT    | `/api/books/:bookId` | Update book info             |
-| DELETE | `/api/books/:bookId` | Delete a book                |
-
-### ✅ Borrow
-
-| Method | Endpoint       | Description                            |
-|--------|----------------|----------------------------------------|
-| POST   | `/api/borrow`  | Borrow a book (with quantity update)   |
-| GET    | `/api/borrow`  | Get borrow summary using aggregation   |
+📍 Server runs on: http://localhost:5000
 
 ---
 
-## 📊 Aggregated Borrow Summary Example
+## ✅ Validations & Business Logic
 
-```json
-{
-  "success": true,
-  "message": "Borrowed books summary retrieved successfully",
-  "data": [
-    {
-      "book": {
-        "title": "The Theory of Everything",
-        "isbn": "9780553380163"
-      },
-      "totalQuantity": 5
-    }
-  ]
-}
-```
+- All book fields are validated (e.g. title, author, genre, ISBN)
+- Genre supports: FICTION, NON_FICTION, SCIENCE, HISTORY, BIOGRAPHY, FANTASY
+- Borrow route validates stock, deducts quantity, updates availability
+- Instance method used to update book availability
+- Aggregation used to calculate borrow summary
 
 ---
 
-## 📽️ Video Explanation
+## 🌍 Deployment
 
-👉 [Click here to watch the video explanation](https://your-video-link.com)
-
----
-
-## 🧑‍💻 Author
-
-- **Name:** Yeamin Madbor  
-- **Email:** yeaminstudent5598@gmail.com  
-- **GitHub:** [@yeaminstudent5598](https://github.com/yeaminstudent5598)
-
----
-
-## 📄 License
-
-This project is open-source under the [MIT License](LICENSE).
-
+- 🚀 Live API: [View API](https://assignment-3-vert-xi.vercel.app/) (if deployed)

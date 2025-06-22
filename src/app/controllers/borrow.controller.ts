@@ -2,12 +2,9 @@ import { Request, Response } from 'express';
 import bookModel from '../models/book.model';
 import borrowModel from '../models/borrow.model';
 
-// ✅ Controller: Borrow a book
 export const borrowBook = async (req: Request, res: Response): Promise<void> => {
   try {
     const { book: bookId, quantity, dueDate } = req.body;
-
-    // Find the book by ID
     const book = await bookModel.findById(bookId);
 
     if (!book || book.copies < quantity) {
@@ -16,22 +13,14 @@ export const borrowBook = async (req: Request, res: Response): Promise<void> => 
         message: 'Not enough copies available',
         error: 'Insufficient copies'
       });
-      return;
+      return;  // early exit, no further processing
     }
 
-    // Update book availability
     book.copies -= quantity;
-    if (book.copies === 0) {
-      book.available = false;
-    }
+    if (book.copies === 0) book.available = false;
     await book.save();
 
-    // Create borrow record
-    const borrow = await borrowModel.create({
-      book: bookId,
-      quantity,
-      dueDate
-    });
+    const borrow = await borrowModel.create({ book: bookId, quantity, dueDate });
 
     res.status(201).json({
       success: true,
@@ -39,15 +28,10 @@ export const borrowBook = async (req: Request, res: Response): Promise<void> => 
       data: borrow
     });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Borrow failed',
-      error: (error as Error).message
-    });
+    res.status(400).json({ success: false, message: 'Borrow failed', error });
   }
 };
 
-// ✅ Controller: Get borrowed summary
 export const getBorrowedSummary = async (_req: Request, res: Response): Promise<void> => {
   try {
     const summary = await borrowModel.aggregate([
@@ -77,16 +61,12 @@ export const getBorrowedSummary = async (_req: Request, res: Response): Promise<
       }
     ]);
 
-    res.status(200).json({
+    res.json({
       success: true,
       message: 'Borrowed books summary retrieved successfully',
       data: summary
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Summary failed',
-      error: (error as Error).message
-    });
+    res.status(500).json({ success: false, message: 'Summary failed', error });
   }
 };

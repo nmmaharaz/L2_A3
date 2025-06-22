@@ -13,7 +13,7 @@ export const borrowBook = async (req: Request, res: Response): Promise<void> => 
         message: 'Not enough copies available',
         error: 'Insufficient copies'
       });
-      return;  // early exit, no further processing
+      return;
     }
 
     book.copies -= quantity;
